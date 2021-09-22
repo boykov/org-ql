@@ -1959,7 +1959,7 @@ ignored."
                         (rest (list :from from-day)))
                    (org-ql--normalize-from-to-on
                      `(clocked :from ,from))))
-                (`(,predicate-names . ,rest)
+                (`(,predicate-names ,rest)
                  (org-ql--normalize-from-to-on
                    `(clocked :from ,from :to ,to))))
   :preambles ((`(,predicate-names ,(pred numberp))
@@ -2108,7 +2108,7 @@ any planning prefix); it defaults to 0 (i.e. the whole regexp)."
    (`(,predicate-names . ,(and rest (guard (numberp (car rest)))))
     (org-ql--normalize-from-to-on
       `(ts :type ,type :to ,to)))
-   (`(,predicate-names . ,rest)
+   (`(,predicate-names ,rest)
     (org-ql--normalize-from-to-on
       `(ts :type ,type :from ,from :to ,to))))
 

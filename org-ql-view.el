@@ -717,21 +717,6 @@ When opened, the link searches the buffer it's opened from."
     (unless (or value transient--prefix)
       (message "Unset %s" variable))))
 
-(define-transient-command org-ql-view-dispatch ()
-  "Show Org QL View dispatcher."
-  [["Edit"
-    ("t" org-ql-view--transient-title)
-    ("q" org-ql-view--transient-query)
-    ("i" org-ql-view--transient-in)
-    ("s" org-ql-view--transient-sort)
-    ("g" org-ql-view--transient-super-groups)]]
-  [["View"
-    ("r" "Refresh" org-ql-view-refresh)
-    ("v" "Select" org-ql-view)]
-   [""
-    ("C-s" "Save" org-ql-view-save)
-    ("C-k" "Delete" org-ql-view-delete)]])
-
 (defun org-ql-view--format-transient-key-value (key value)
   "Return KEY and VALUE formatted for display in Transient."
   ;; `window-width' minus 15 is about right.  I think there's no way
@@ -751,71 +736,6 @@ When opened, the link searches the buffer it's opened from."
                       (->> value
                         org-ql-view--format-query
                         (org-ql-view--font-lock-string 'emacs-lisp-mode)))))
-
-(define-infix-command org-ql-view--transient-title ()
-  ;; TODO: Add an asterisk or something when the view has been modified but not saved.
-  :description (lambda () (org-ql-view--format-transient-key-value "Title" org-ql-view-title))
-  :class 'org-ql-view--variable
-  :argument ""
-  :variable 'org-ql-view-title
-  :prompt "Title: "
-  :reader (lambda (prompt _initial-input history)
-            ;; FIXME: Figure out how to integrate initial-input.
-            (read-string prompt (when org-ql-view-title
-                                  (format "%s" org-ql-view-title))
-                         history)))
-
-(define-infix-command org-ql-view--transient-query ()
-  :description (lambda () (org-ql-view--format-transient-lisp-argument "Query" org-ql-view-query))
-  :class 'org-ql-view--variable
-  :argument ""
-  :variable 'org-ql-view-query
-  :prompt "Query: "
-  :reader (lambda (prompt _initial-input history)
-            ;; FIXME: Figure out how to integrate initial-input.
-            (let ((query (read-string prompt (when org-ql-view-query
-                                               (format "%S" org-ql-view-query))
-                                      history)))
-              (if (or (string-prefix-p "(" query)
-                      (string-prefix-p "\"" query))
-                  ;; Read sexp query.
-                  (read query)
-                ;; Parse non-sexp query into sexp query.
-                (org-ql--query-string-to-sexp query)))))
-
-(define-infix-command org-ql-view--transient-in ()
-  :description (lambda () (org-ql-view--format-transient-lisp-argument "In buffers/files" org-ql-view-buffers-files))
-  :class 'org-ql-view--variable
-  :argument ""
-  :variable 'org-ql-view-buffers-files
-  :prompt "Buffers/files: "
-  :reader (lambda (_prompt _initial-input _history)
-            ;; This doesn't use the Transient `initial-input'
-            ;; argument, but it gives the same result.
-            (org-ql-view--complete-buffers-files)))
-
-(define-infix-command org-ql-view--transient-super-groups ()
-  :description (lambda ()
-                 (org-ql-view--format-transient-lisp-argument "Group by" org-ql-view-super-groups))
-  :class 'org-ql-view--variable
-  :argument ""
-  :variable 'org-ql-view-super-groups
-  :prompt "Group by: "
-  :reader (lambda (_prompt _initial-input _history)
-            ;; FIXME: Figure out how to integrate initial-input and history.
-            (org-ql-view--complete-super-groups)))
-
-(define-infix-command org-ql-view--transient-sort ()
-  :description
-  (lambda ()
-    (org-ql-view--format-transient-lisp-argument "Sort by" (or org-ql-view-sort 'buffer-order)))
-  :class 'org-ql-view--variable
-  :argument ""
-  :variable 'org-ql-view-sort
-  :prompt "Sort: "
-  :reader (lambda (_prompt _initial-input _history)
-            ;; FIXME: Figure out how to integrate initial-input and history.
-            (org-ql-view--complete-sort)))
 
 ;;;; Faces/properties
 
